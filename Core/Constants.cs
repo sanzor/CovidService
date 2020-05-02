@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Process {
+namespace CovidService {
     public class Constants {
         public const string LOG_FILE = @"log/log.txt";
         public const string CONFIG_FILE = "appsettings.json";

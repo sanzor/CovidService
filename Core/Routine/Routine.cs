@@ -11,7 +11,7 @@ using System.Text.Json;
 using System.ServiceProcess;
 using Serilog;
 
-namespace Process {
+namespace CovidService {
     public sealed class Routine {
      
         private Records output { get; set; }

@@ -8,29 +8,25 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Process {
+namespace CovidService {
     public class CovidService : ServiceBase {
-        private bool IsDataUpdatedToday = false;
+
         private readonly Config config;
         private DateTime lastUpdate;
-        private Task routineTask;
-
         public CovidService(Config config) {
             this.config = config;
         }
       
         protected override void OnStart(string[] args) {
             try {
-                if (!OnStartCheckAsync().Result) {
+                if (!ShoulRunRoutineOnStartAsync().Result) {
                     return;
                 }
-                Log.Information("Running Routine from OnStart");
+                Log.Information("Running Routine OnStart");
                 RunRoutineAsync().Wait();
 
             } catch (Exception ex) {
                 Log.Error(ex.Message);
-
-
             }
 
         }
@@ -40,14 +36,14 @@ namespace Process {
                 if (!(changeDescription.Reason == SessionChangeReason.SessionLogon || changeDescription.Reason == SessionChangeReason.SessionUnlock)) {
                     return;
                 }
-                if (!IsOutdated(this.lastUpdate, TimeSpan.FromHours(config.QueryDelay))) {
+                if (!TimeCalculator.IsOutDated(this.lastUpdate, TimeSpan.FromHours(config.QueryDelay))) {
                     return;
                 }
                 Log.Information("Running Routine from SessionChange");
                 RunRoutineAsync().Wait();
             } catch (Exception ex) {
-
-                throw;
+                Log.Error("Session Change Error", ex.Message);
+                return;
             }
         }
 
@@ -64,7 +60,7 @@ namespace Process {
         /// Checks if routine should run on start event
         /// </summary>
         /// <returns>If routine should start</returns>
-        private async Task<bool> OnStartCheckAsync() {
+        private async Task<bool> ShoulRunRoutineOnStartAsync() {
             try {
                 var data = JsonSerializer.Deserialize<Records>(await File.ReadAllTextAsync(config.OutputFile));
                
@@ -72,20 +68,17 @@ namespace Process {
                     return true;
                 }
                 this.lastUpdate = data.Items.Max(x => x.Date);
-                if (IsOutdated(lastUpdate, TimeSpan.FromHours(this.config.QueryDelay))) {
+                if (TimeCalculator.IsOutDated(lastUpdate, TimeSpan.FromHours(this.config.QueryDelay))) {
                     return true;
                 }
                 return false;
 
             } catch (Exception ex) {
+                Log.Error("OnStart reading records file error",ex.Message);
                 return true;
             }
             
         }
-        private static bool IsOutdated(DateTime lastUpdate, TimeSpan delay) {
-            var now = DateTime.UtcNow;
-            var isOutdated = now - lastUpdate > delay;
-            return isOutdated;
-        }
+      
     }
 }
