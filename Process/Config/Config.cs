@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.Json.Serialization;
+
+namespace Process {
+    [Serializable]
+    public class Config {
+        [JsonPropertyName("outputFile")]
+        public string OutputFile { get; set; }
+        [JsonPropertyName("inputUrl")]
+        public string InputUrl { get; set; }
+        public static Config Default => new Config {
+            InputUrl = "https://api1.datelazi.ro/api/v2/data",
+            OutputFile= Constants.OUTPUT_FILE
+        };
+    }
+}
