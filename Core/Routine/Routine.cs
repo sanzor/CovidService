@@ -34,8 +34,6 @@ namespace Process {
             this.output=Processor.Process(rawData);
             Log.Information("Saving data to target location");
             await SaveDataAsync();
-
-
         }
         private async Task<string> DownloadDataAsync() {
             using (HttpClient client = new HttpClient()) {
