@@ -52,7 +52,7 @@ namespace Process {
         }
         private async Task SaveDataAsync() {
             var payload = JsonSerializer.Serialize(this.output);
-            File.WriteAllText(config.OutputFile, payload);
+            File.WriteAllText(config.OutputFile??Constants.OUTPUT_FILE, payload);
         }
     }
 }
