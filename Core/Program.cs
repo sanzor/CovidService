@@ -6,6 +6,7 @@ using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.ServiceProcess;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Process {
@@ -28,6 +29,7 @@ namespace Process {
                 Log.Error(ex.Message);
                 Log.Information($"Could not find config file at path:\t{configPath}\nWill use default one");
                 config = Config.Default;
+                File.WriteAllText(configPath,JsonSerializer.Serialize(config)));
             }
             return config;
 
